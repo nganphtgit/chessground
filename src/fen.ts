@@ -7,6 +7,7 @@ const roles: { [letter: string]: cg.Role } = { p: 'pawn', r: 'rook', n: 'knight'
 
 const letters = { pawn: 'p', rook: 'r', knight: 'n', bishop: 'b', queen: 'q', king: 'k' };
 
+
 export function read(fen: cg.FEN): cg.Pieces {
   if (fen === 'start') fen = initial;
   const pieces: cg.Pieces = {};
@@ -21,8 +22,7 @@ export function read(fen: cg.FEN): cg.Pieces {
         col = 0;
         break;
       case '~':
-        const piece = pieces[pos2key([col, row])];
-        if (piece) piece.promoted = true;
+        pieces[pos2key([col, row])].promoted = true;
         break;
       default:
         const nb = c.charCodeAt(0);
@@ -41,10 +41,11 @@ export function read(fen: cg.FEN): cg.Pieces {
 }
 
 export function write(pieces: cg.Pieces): cg.FEN {
+  let piece: cg.Piece, letter: string;
   return invRanks.map(y => cg.ranks.map(x => {
-      const piece = pieces[pos2key([x, y])];
+      piece = pieces[pos2key([x, y])];
       if (piece) {
-        const letter = letters[piece.role];
+        letter = letters[piece.role];
         return piece.color === 'white' ? letter.toUpperCase() : letter;
       } else return '1';
     }).join('')

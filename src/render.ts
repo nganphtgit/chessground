@@ -134,7 +134,7 @@ export default function render(s: State): void {
   // or append new pieces
   for (const j in piecesKeys) {
     k = piecesKeys[j];
-    p = pieces[k]!;
+    p = pieces[k];
     anim = anims[k];
     if (!samePieces[k]) {
       pMvdset = movedPieces[pieceNameOf(p)];
@@ -158,7 +158,8 @@ export default function render(s: State): void {
         translate(pMvd, posToTranslate(pos, asWhite));
       }
       // no piece in moved obj: insert the new piece
-      // assumes the new piece is not being dragged
+      // new: assume the new piece is not being dragged
+      // might be a bad idea
       else {
 
         const pieceName = pieceNameOf(p),

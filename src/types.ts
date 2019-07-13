@@ -15,10 +15,10 @@ export interface Drop {
   key: Key;
 }
 export interface Pieces {
-  [key: string]: Piece | undefined;
+  [key: string]: Piece;
 }
 export interface PiecesDiff {
-  [key: string]: Piece | undefined;
+  [key: string]: Piece | null;
 }
 
 export type KeyPair = [Key, Key];
@@ -30,10 +30,16 @@ export type NumberQuad = [number, number, number, number];
 export interface Dests {
   [key: string]: Key[]
 }
-
+export interface MaterialDiffSide {
+  [role: string]: number;
+}
+export interface MaterialDiff {
+  white: MaterialDiffSide;
+  black: MaterialDiffSide;
+}
 export interface Elements {
   board: HTMLElement;
-  container: HTMLElement;
+  over?: HTMLElement;
   ghost?: HTMLElement;
   svg?: SVGElement;
 }

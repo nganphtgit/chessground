@@ -1,23 +1,17 @@
 <img src="https://raw.githubusercontent.com/ornicar/chessground/master/screenshot/twin.jpg" width="100%" alt="Chessground in 2D and 3D" />
 
-**Chessground** is free/libre open source chess UI developed for [lichess.org](https://lichess.org).
+**Chessground** is the opensource chess UI developed for [lichess.org](https://lichess.org).
 
 It targets modern browsers, as well as mobile development using Cordova.
 
-## License
-
-Chessground is distributed under the **GPL-3.0 license**.
-When you use chessground, your website becomes GPL as well, and **you must release your source code**.
-
-Please read more about GPL for JavaScript on [greendrake.info/#nfy0](http://greendrake.info/#nfy0).
-
-## Demos
+### Demos
 
 - [Chess TV](https://lichess.org/tv)
 - [Board editor](https://lichess.org/editor)
 - [Puzzle solver](https://lichess.org/training)
 - [Analysis board](https://lichess.org/ofWXRFGy)
 - [Game preview](https://lichess.org/games)
+- [Chess Captcha](https://lichess.org/signup)
 
 ## Features
 
@@ -25,7 +19,7 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
 
 - Well typed with typescript
 - Fast. Uses a custom DOM diff algorithm to reduce DOM writes to the absolute minimum
-- Small footprint: 10K gzipped (30K unzipped). No dependencies.
+- Small footprint: 10K gzipped (31K unzipped). No dependencies.
 - SVG drawing of circles and arrows on the board
 - Entirely configurable and reconfigurable at any time
 - Styling with CSS only: board and pieces can be changed by simply switching a class
@@ -37,11 +31,12 @@ Chessground is designed to fulfill all lichess.org web and mobile apps needs, so
   - minimum distance before drag
   - centralisation of the piece under the cursor
   - piece ghost element
+  - square over elements
   - drop off revert or trash
 - Premove by click or drag
 - Drag new pieces onto the board (editor, crazyhouse)
 - Animation of pieces: moving and fading away
-- Display last move, check, move destinations, and premove destinations (hover effects possible)
+- Display last move, check, move destinations, and premove destinations
 - Import and export positions in FEN notation
 - User callbacks
 - No chess logic inside: can be used for [chess variants](https://lichess.org/variant)

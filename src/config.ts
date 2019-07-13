@@ -74,9 +74,9 @@ export interface Config {
     // capturedPiece is undefined or like {color: 'white'; 'role': 'queen'}
     move?: (orig: cg.Key, dest: cg.Key, capturedPiece?: cg.Piece) => void;
     dropNewPiece?: (piece: cg.Piece, key: cg.Key) => void;
-    select?: (key: cg.Key) => void; // called when a square is selected
-    insert?: (elements: cg.Elements) => void; // when the board DOM has been (re)inserted
+    select?: (key: cg.Key) => void // called when a square is selected
   };
+  items?: (pos: cg.Pos, key: cg.Key) => any | undefined; // items on the board { render: key -> vdom }
   drawable?: {
     enabled?: boolean; // can draw
     visible?: boolean; // can view
@@ -121,8 +121,7 @@ export function configure(state: State, config: Config) {
     const rank = state.movable.color === 'white' ? 1 : 8;
     const kingStartPos = 'e' + rank;
     const dests = state.movable.dests[kingStartPos];
-    const king = state.pieces[kingStartPos];
-    if (!dests || !king || king.role !== 'king') return;
+    if (!dests || state.pieces[kingStartPos].role !== 'king') return;
     state.movable.dests[kingStartPos] = dests.filter(d =>
       !((d === 'a' + rank) && dests.indexOf('c' + rank as cg.Key) !== -1) &&
         !((d === 'h' + rank) && dests.indexOf('g' + rank as cg.Key) !== -1)
@@ -131,7 +130,7 @@ export function configure(state: State, config: Config) {
 };
 
 function merge(base: any, extend: any) {
-  for (let key in extend) {
+  for (var key in extend) {
     if (isObject(base[key]) && isObject(extend[key])) merge(base[key], extend[key]);
     else base[key] = extend[key];
   }

@@ -1,61 +1,57 @@
 import { State } from './state'
-import { colors, setVisible, createEl } from './util'
+import { colors, translateAway, createEl } from './util'
 import { files, ranks } from './types'
 import { createElement as createSVG } from './svg'
 import { Elements } from './types'
 
-export default function wrap(element: HTMLElement, s: State, relative: boolean): Elements {
-
-  // .cg-wrap (element passed to Chessground)
-  //   cg-helper (12.5%)
-  //     cg-container (800%)
-  //       cg-board
-  //       svg
-  //       coords.ranks
-  //       coords.files
-  //       piece.ghost
+export default function wrap(element: HTMLElement, s: State, bounds?: ClientRect): Elements {
 
   element.innerHTML = '';
 
-  element.classList.add('cg-wrap');
+  element.classList.add('cg-board-wrap');
   colors.forEach(c => {
     element.classList.toggle('orientation-' + c, s.orientation === c);
   });
   element.classList.toggle('manipulable', !s.viewOnly);
 
-  const helper = createEl('cg-helper');
-  element.appendChild(helper);
-  const container = createEl('cg-container');
-  helper.appendChild(container);
+  const board = createEl('div', 'cg-board');
 
-  const board = createEl('cg-board');
-  container.appendChild(board);
+  element.appendChild(board);
 
   let svg: SVGElement | undefined;
-  if (s.drawable.visible && !relative) {
+  if (s.drawable.visible && bounds) {
     svg = createSVG('svg');
     svg.appendChild(createSVG('defs'));
-    container.appendChild(svg);
+    element.appendChild(svg);
   }
 
   if (s.coordinates) {
     const orientClass = s.orientation === 'black' ? ' black' : '';
-    container.appendChild(renderCoords(ranks, 'ranks' + orientClass));
-    container.appendChild(renderCoords(files, 'files' + orientClass));
+    element.appendChild(renderCoords(ranks, 'ranks' + orientClass));
+    element.appendChild(renderCoords(files, 'files' + orientClass));
+  }
+
+  let over: HTMLElement | undefined;
+  if (bounds && (s.movable.showDests || s.premovable.showDests)) {
+    over = createEl('div', 'over');
+    translateAway(over);
+    over.style.width = (bounds.width / 8) + 'px';
+    over.style.height = (bounds.height / 8) + 'px';
+    element.appendChild(over);
   }
 
   let ghost: HTMLElement | undefined;
-  if (s.draggable.showGhost && !relative) {
+  if (bounds && s.draggable.showGhost) {
     ghost = createEl('piece', 'ghost');
-    setVisible(ghost, false);
-    container.appendChild(ghost);
+    translateAway(ghost);
+    element.appendChild(ghost);
   }
 
   return {
-    board,
-    container,
-    ghost,
-    svg
+    board: board,
+    over: over,
+    ghost: ghost,
+    svg: svg
   };
 }
 

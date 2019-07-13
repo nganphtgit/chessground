@@ -32,10 +32,10 @@ export function setPieces(state: State, pieces: cg.PiecesDiff): void {
 }
 
 export function setCheck(state: State, color: cg.Color | boolean): void {
-  state.check = undefined;
   if (color === true) color = state.turnColor;
-  if (color) for (let k in state.pieces) {
-    if (state.pieces[k]!.role === 'king' && state.pieces[k]!.color === color) {
+  if (!color) state.check = undefined;
+  else for (let k in state.pieces) {
+    if (state.pieces[k].role === 'king' && state.pieces[k].color === color) {
       state.check = k as cg.Key;
     }
   }
@@ -74,7 +74,7 @@ export function unsetPredrop(state: State): void {
 function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   if (!state.autoCastle) return false;
   const king = state.pieces[orig];
-  if (!king || king.role !== 'king') return false;
+  if (king.role !== 'king') return false;
   const origPos = key2pos(orig);
   if (origPos[0] !== 5) return false;
   if (origPos[1] !== 1 && origPos[1] !== 8) return false;
@@ -91,7 +91,7 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
   } else return false;
 
   const rook = state.pieces[oldRookPos];
-  if (!rook || rook.role !== 'rook') return false;
+  if (rook.role !== 'rook') return false;
 
   delete state.pieces[orig];
   delete state.pieces[oldRookPos];
@@ -102,13 +102,15 @@ function tryAutoCastle(state: State, orig: cg.Key, dest: cg.Key): boolean {
 }
 
 export function baseMove(state: State, orig: cg.Key, dest: cg.Key): cg.Piece | boolean {
-  const origPiece = state.pieces[orig], destPiece = state.pieces[dest];
-  if (orig === dest || !origPiece) return false;
-  const captured = (destPiece && destPiece.color !== origPiece.color) ? destPiece : undefined;
+  if (orig === dest || !state.pieces[orig]) return false;
+  const captured: cg.Piece | undefined = (
+    state.pieces[dest] &&
+    state.pieces[dest].color !== state.pieces[orig].color
+  ) ? state.pieces[dest] : undefined;
   if (dest == state.selected) unselect(state);
   callUserFunction(state.events.move, orig, dest, captured);
   if (!tryAutoCastle(state, orig, dest)) {
-    state.pieces[dest] = origPiece;
+    state.pieces[dest] = state.pieces[orig];
     delete state.pieces[orig];
   }
   state.lastMove = [orig, dest];
@@ -171,14 +173,14 @@ export function userMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 export function dropNewPiece(state: State, orig: cg.Key, dest: cg.Key, force?: boolean): void {
   if (canDrop(state, orig, dest) || force) {
-    const piece = state.pieces[orig]!;
+    const piece = state.pieces[orig];
     delete state.pieces[orig];
     baseNewPiece(state, piece, dest, force);
     callUserFunction(state.movable.events.afterNewPiece, piece.role, dest, {
       predrop: false
     });
   } else if (canPredrop(state, orig, dest)) {
-    setPredrop(state, state.pieces[orig]!.role, dest);
+    setPredrop(state, state.pieces[orig].role, dest);
   } else {
     unsetPremove(state);
     unsetPredrop(state);
@@ -218,7 +220,7 @@ export function unselect(state: State): void {
 
 function isMovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
-  return !!piece && (
+  return piece && (
     state.movable.color === 'both' || (
       state.movable.color === piece.color &&
         state.turnColor === piece.color
@@ -233,7 +235,7 @@ export function canMove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
-  return !!piece && dest && (orig === dest || !state.pieces[dest]) && (
+  return piece && dest && (orig === dest || !state.pieces[dest]) && (
     state.movable.color === 'both' || (
       state.movable.color === piece.color &&
         state.turnColor === piece.color
@@ -243,7 +245,7 @@ function canDrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 function isPremovable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
-  return !!piece && state.premovable.enabled &&
+  return piece && state.premovable.enabled &&
   state.movable.color === piece.color &&
     state.turnColor !== piece.color;
 }
@@ -256,9 +258,8 @@ function canPremove(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
   const piece = state.pieces[orig];
-  const destPiece = state.pieces[dest];
-  return !!piece && dest &&
-  (!destPiece || destPiece.color !== state.movable.color) &&
+  return piece && dest &&
+  (!state.pieces[dest] || state.pieces[dest].color !== state.movable.color) &&
   state.predroppable.enabled &&
   (piece.role !== 'pawn' || (dest[1] !== '1' && dest[1] !== '8')) &&
   state.movable.color === piece.color &&
@@ -267,7 +268,7 @@ function canPredrop(state: State, orig: cg.Key, dest: cg.Key): boolean {
 
 export function isDraggable(state: State, orig: cg.Key): boolean {
   const piece = state.pieces[orig];
-  return !!piece && state.draggable.enabled && (
+  return piece && state.draggable.enabled && (
     state.movable.color === 'both' || (
       state.movable.color === piece.color && (
         state.turnColor === piece.color || state.premovable.enabled

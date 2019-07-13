@@ -47,6 +47,8 @@ export const distanceSq: (pos1: cg.Pos, pos2: cg.Pos) => number = (pos1, pos2) =
 export const samePiece: (p1: cg.Piece, p2: cg.Piece) => boolean = (p1, p2) =>
   p1.role === p2.role && p1.color === p2.color;
 
+export const computeIsTrident = () => window.navigator.userAgent.indexOf('Trident/') > -1;
+
 const posToTranslateBase: (pos: cg.Pos, asWhite: boolean, xFactor: number, yFactor: number) => cg.NumberPair =
 (pos, asWhite, xFactor, yFactor) => [
   (asWhite ? pos[0] - 1 : 8 - pos[0]) * xFactor,
@@ -71,9 +73,7 @@ export const translateRel = (el: HTMLElement, percents: cg.NumberPair) => {
   el.style.top = percents[1] + '%';
 }
 
-export const setVisible = (el: HTMLElement, v: boolean) => {
-  el.style.visibility = v ? 'visible' : 'hidden';
-}
+export const translateAway = (el: HTMLElement) => translateAbs(el, [-99999, -99999]);
 
 // touchend has no position!
 export const eventPosition: (e: cg.MouchEvent) => cg.NumberPair | undefined = e => {

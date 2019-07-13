@@ -15,9 +15,8 @@ export function bindBoard(s: State): void {
   onStart = startDragOrDraw(s);
 
   // must NOT be a passive event!
-
-  boardEl.addEventListener('touchstart', onStart as EventListener);
-  boardEl.addEventListener('mousedown', onStart as EventListener);
+  boardEl.addEventListener('touchstart', onStart);
+  boardEl.addEventListener('mousedown', onStart);
 
   if (s.disableContextMenu || s.drawable.enabled) {
     boardEl.addEventListener('contextmenu', e => e.preventDefault());
@@ -54,8 +53,8 @@ export function bindDocument(s: State, redrawAll: cg.Redraw): cg.Unbind {
 }
 
 function unbindable(el: EventTarget, eventName: string, callback: MouchBind, options?: any): cg.Unbind {
-  el.addEventListener(eventName, callback as EventListener, options);
-  return () => el.removeEventListener(eventName, callback as EventListener);
+  el.addEventListener(eventName, callback, options);
+  return () => el.removeEventListener(eventName, callback);
 }
 
 function startDragOrDraw(s: State): MouchBind {
